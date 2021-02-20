@@ -31,7 +31,6 @@ src/config.json
 .envrc
 
 /cache
-yarn.lock
 
 /data/*
 !/data/latest.csv

@@ -135,6 +135,7 @@ const normalizePostalValue = text => {
 const getPostalKanaOrRomeItems = (
   prefName,
   cityName,
+  areaName,
   postalCodeKanaOrRomeItems,
   postalKanaOrRomeCityFieldName,
   altKanaOrRomeCityFieldName,
@@ -146,11 +147,19 @@ const getPostalKanaOrRomeItems = (
   )
 
   if (postalAlt) {
-    const postalRecord = postalCodeKanaOrRomeItems.find(
+    let postalRecord = postalCodeKanaOrRomeItems.find(
       item =>
         item['都道府県名'] === prefName &&
-        item['市区町村名'] === postalAlt.postal
+        item['市区町村名'] === postalAlt.postal &&
+        areaName.startsWith(item['町域名'])
     )
+    if (!postalRecord) {
+      postalRecord = postalCodeKanaOrRomeItems.find(
+        item =>
+          item['都道府県名'] === prefName &&
+          item['市区町村名'] === postalAlt.postal
+      )
+    }
 
     if (postalRecord && postalAlt[altKanaOrRomeCityFieldName]) {
       postalRecord[postalKanaOrRomeCityFieldName] = postalAlt[altKanaOrRomeCityFieldName]
@@ -158,11 +167,19 @@ const getPostalKanaOrRomeItems = (
 
     return postalRecord
   } else {
-    const postalRecord = postalCodeKanaOrRomeItems.find(
+    let postalRecord = postalCodeKanaOrRomeItems.find(
       item =>
         item['都道府県名'] === prefName &&
-        item['市区町村名'] === cityName
+        item['市区町村名'] === cityName &&
+        areaName.startsWith(item['町域名'])
     )
+    if (!postalRecord) {
+      postalRecord = postalCodeKanaOrRomeItems.find(
+        item =>
+          item['都道府県名'] === prefName &&
+          item['市区町村名'] === cityName
+      )
+    }
     return postalRecord
   }
 }
@@ -225,7 +242,7 @@ const downloadPostalCodeRome = () => {
   return new Promise((resolve, reject) => {
     const url =
       'https://www.post.japanpost.jp/zipcode/dl/roman/ken_all_rome.zip'
-    const csvPath = `${dataDir}/postalcode.csv`
+    const csvPath = `${dataDir}/postalcode-rome.csv`
     https.get(url, res => {
       res
         .pipe(unzip.Parse())
@@ -316,12 +333,13 @@ const getAddressItems = (
                       (pref === line['都道府県名'] &&
                        orig === line['市区町村名']))
                 const cityName = renameEntry ? renameEntry.renamed : line['市区町村名']
+                const areaName = line['大字町丁目名'];
 
                 const postalCodeKanaItem = getPostalKanaOrRomeItems(
-                  line['都道府県名'], cityName, postalCodeKanaItems, '市区町村名カナ', 'kana'
+                  line['都道府県名'], cityName, areaName, postalCodeKanaItems, '市区町村名カナ', 'kana'
                 )
                 const postalCodeRomeItem = getPostalKanaOrRomeItems(
-                  line['都道府県名'], cityName, postalCodeRomeItems, '市区町村名ローマ字', 'rome'
+                  line['都道府県名'], cityName, areaName, postalCodeRomeItems, '市区町村名ローマ字', 'rome'
                 )
 
                 if (postalCodeKanaItem && postalCodeRomeItem) {
@@ -347,8 +365,9 @@ const getAddressItems = (
                   postalCodeRomeItem
                     ? postalCodeRomeItem['市区町村名ローマ字']
                     : '',
+                  postalCodeKanaItem['郵便番号'],
                   line['大字町丁目コード'],
-                  line['大字町丁目名'],
+                  areaName,
                   line['緯度'],
                   line['経度'],
                 ]
@@ -386,6 +405,7 @@ const main = async () => {
       '"市区町村名"',
       '"市区町村名カナ"',
       '"市区町村名ローマ字"',
+      '"郵便番号"',
       '"大字町丁目コード"',
       '"大字町丁目名"',
       '"緯度"',

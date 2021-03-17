@@ -414,7 +414,10 @@ const main = async () => {
   ]
 
   const promises = []
-  for (let i = 1; i < 48; i++) {
+  // NOTE: 都道府県単位の繰り返し(1~47)
+  const startPref = 1;
+  const endPref = 47;
+  for (let i = startPref; i < (endPref+1); i++) {
     let prefCode = i.toString()
     if (i < 10) {
       prefCode = `0${prefCode}`

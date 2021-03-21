@@ -9,6 +9,8 @@ const Encoding = require('encoding-japanese')
 const csvParse = require('csv-parse/lib/sync')
 const cliProgress = require('cli-progress')
 
+const geohash = require('ngeohash');
+
 const dataDir = path.join(path.dirname(path.dirname(__filename)), 'data')
 
 const isjRenames = [
@@ -348,6 +350,16 @@ const getAddressItems = (
                   nohit++
                   nohitCases[line['都道府県名'] + cityName] = true
                 }
+
+                // NOTE: lat: latitude: 緯度
+                // NOTE: lon: longitude: 経度
+                const lat = line['緯度'];
+                const lon = line['経度'];
+                // NOTE: geohash.encode (latitude, longitude, precision=9)
+                // [緯度経度:小数点桁数と精度の関係](https://qiita.com/y-ken/items/55d8e90d1a826391cda8#%E5%B0%8F%E6%95%B0%E7%82%B9%E6%A1%81%E6%95%B0%E3%81%A8%E7%B2%BE%E5%BA%A6%E3%81%AE%E9%96%A2%E4%BF%82)
+                // [GeoHash:精度について](https://qiita.com/yabooun/items/da59e47d61ddff141f0c#%E7%B2%BE%E5%BA%A6%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
+                const geohashCode = geohash.encode(lat, lon); // NOTE: prints ww8p1r4t8
+
                 const record = [
                   line['都道府県コード'],
                   line['都道府県名'],
@@ -370,6 +382,7 @@ const getAddressItems = (
                   areaName,
                   line['緯度'],
                   line['経度'],
+                  geohashCode,
                 ]
                   .map(item =>
                     item && typeof item === 'string' ? `"${item}"` : item,
@@ -410,6 +423,7 @@ const main = async () => {
       '"大字町丁目名"',
       '"緯度"',
       '"経度"',
+      '"GeoHash"',
     ].join(','),
   ]
 

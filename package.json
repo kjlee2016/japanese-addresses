@@ -15,6 +15,7 @@
   "dependencies": {
     "cli-progress": "^3.8.2",
     "csv-parse": "^4.10.1",
-    "encoding-japanese": "^1.0.30"
+    "encoding-japanese": "^1.0.30",
+    "ngeohash": "^0.6.3"
   }
 }

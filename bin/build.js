@@ -388,12 +388,12 @@ const main = async () => {
 
   const finalOutput = [
     [
-      '"住所ID(大字町丁目コード)"',
-      '"都道府県名"',
-      '"市区町村名"',
-      '"大字町丁目名"',
-      '"位置(経度 緯度)"',
-      '"郵便番号"',
+      'id', // NOTE: 住所ID(大字町丁目コード)
+      'pref', // NOTE: 都道府県名
+      'city', // NOTE: 市区町村名
+      'street', // NOTE: 大字町丁目名
+      'location', // NOTE: 位置(経度 緯度)
+      'zipcode', // NOTE: 郵便番号
     ].join(','),
   ]
 

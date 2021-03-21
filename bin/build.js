@@ -348,28 +348,19 @@ const getAddressItems = (
                   nohit++
                   nohitCases[line['都道府県名'] + cityName] = true
                 }
+
+                // NOTE: lat: latitude: 緯度
+                // NOTE: lon: longitude: 経度
+                const lat = line['緯度'];
+                const lon = line['経度'];
+
                 const record = [
-                  line['都道府県コード'],
-                  line['都道府県名'],
-                  postalCodeKanaItem
-                    ? han2zen(postalCodeKanaItem['都道府県名カナ'])
-                    : '',
-                  postalCodeRomeItem
-                    ? postalCodeRomeItem['都道府県名ローマ字']
-                    : '',
-                  line['市区町村コード'],
-                  cityName,
-                  postalCodeKanaItem
-                    ? han2zen(postalCodeKanaItem['市区町村名カナ'])
-                    : '',
-                  postalCodeRomeItem
-                    ? postalCodeRomeItem['市区町村名ローマ字']
-                    : '',
-                  postalCodeKanaItem['郵便番号'],
                   line['大字町丁目コード'],
+                  line['都道府県名'],
+                  cityName,
                   areaName,
-                  line['緯度'],
-                  line['経度'],
+                  `POINT(${lon} ${lat})`,
+                  postalCodeKanaItem['郵便番号'],
                 ]
                   .map(item =>
                     item && typeof item === 'string' ? `"${item}"` : item,
@@ -397,19 +388,12 @@ const main = async () => {
 
   const finalOutput = [
     [
-      '"都道府県コード"',
+      '"住所ID(大字町丁目コード)"',
       '"都道府県名"',
-      '"都道府県名カナ"',
-      '"都道府県名ローマ字"',
-      '"市区町村コード"',
       '"市区町村名"',
-      '"市区町村名カナ"',
-      '"市区町村名ローマ字"',
-      '"郵便番号"',
-      '"大字町丁目コード"',
       '"大字町丁目名"',
-      '"緯度"',
-      '"経度"',
+      '"位置(経度 緯度)"',
+      '"郵便番号"',
     ].join(','),
   ]
 
